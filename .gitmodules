@@ -1,0 +1,24 @@
+[submodule "cv_image_detector"]
+	path = cv_image_detector
+	url = git@github.com:marpelt/cv_image_detector.git
+[submodule "cv_msg_logger"]
+	path = cv_msg_logger
+	url = git@github.com:marpelt/cv_msg_logger.git
+[submodule "cv_april_detector"]
+	path = cv_april_detector
+	url = git@github.com:marpelt/cv_april_detector.git
+[submodule "cv_landolt_detector"]
+	path = cv_landolt_detector
+	url = git@github.com:marpelt/cv_landolt_detector.git
+[submodule "cv_hazmat_detector"]
+	path = cv_hazmat_detector
+	url = git@github.com:marpelt/cv_hazmat_detector.git
+[submodule "cv_qr_detector"]
+	path = cv_qr_detector
+	url = git@github.com:marpelt/cv_qr_detector.git
+[submodule "cv_rotation_detector"]
+	path = cv_rotation_detector
+	url = git@github.com:marpelt/cv_rotation_detector.git
+[submodule "cv_msg"]
+	path = cv_msg
+	url = git@github.com:marpelt/cv_msg.git

@@ -9,6 +9,14 @@
 
     <buildtool_depend>catkin</buildtool_depend>
 
+    <exec_depend>cv_rotation_detector</exec_depend>
+    <exec_depend>cv_qr_detector</exec_depend>
+    <exec_depend>cv_hazmat_detector</exec_depend>
+    <exec_depend>cv_landolt_detector</exec_depend>
+    <exec_depend>cv_april_detector</exec_depend>
+    <exec_depend>cv_msg_logger</exec_depend>
+    <exec_depend>cv_image_detector</exec_depend>
+
     <export>
         <metapackage/>
     </export>
