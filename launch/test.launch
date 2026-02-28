@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="model" default="hazmat.pt" />
+    <arg name="use_cuda" default="false" />
+    <arg name="min_confidence" default="75" />
+    <arg name="camera_topic" default="/screen/camera/image_raw/compressed" />
+    <arg name="camera_id" default="0" />
+    <arg name="cv_msg_topic" default="/cv_bundle" />
+
+    <node name="screen_camera_node" pkg="screen_camera" type="screen_camera_publisher.py" output="screen">
+    </node>
+
+    <node name="hazmat_detector_node" pkg="cv_hazmat_detector" type="detector.py" output="screen">
+        <param name="model_file" value="$(arg model)" />
+        <param name="device" value="$(eval 'cuda' if arg('use_cuda') else 'cpu')" />
+        <param name="min_confidence" value="$(arg min_confidence)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+    </node>
+
+</launch>
