@@ -7,6 +7,8 @@
     <arg name="camera_topic" default="/screen/camera/image_raw/compressed" />
     <arg name="camera_id" default="0" />
     <arg name="cv_msg_topic" default="/cv_bundle" />
+    
+    <arg name="tag_standard" default="tagStandard41h12" />
 
     <node name="screen_camera_node" pkg="screen_camera" type="screen_camera_publisher.py" output="screen">
     </node>
@@ -15,6 +17,11 @@
         <param name="model_file" value="$(arg model)" />
         <param name="device" value="$(eval 'cuda' if arg('use_cuda') else 'cpu')" />
         <param name="min_confidence" value="$(arg min_confidence)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+    </node>
+
+    <node name="april_detector_node" pkg="cv_april_detector" type="detector.py" output="screen">
+        <param name="tag_standard" value="$(arg tag_standard)" />
         <param name="camera_topic" value="$(arg camera_topic)" />
     </node>
 
