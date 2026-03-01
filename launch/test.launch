@@ -35,10 +35,16 @@
         <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
     </node> -->
 
-    <node pkg="cv_landolt_detector" type="cv_landolt_detector_node" name="landolt_detector_node" output="screen">
+    <!-- <node name="landolt_detector_node" pkg="cv_landolt_detector" type="cv_landolt_detector_node"  output="screen">
         <param name="camera_topic" value="$(arg camera_topic)" />
         <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
         <param name="camera_id" value="$(arg camera_id)" />
-    </node>
+    </node> -->
+
+    <!-- <node name="cv_qr_detector_node" pkg="cv_qr_detector" type="cv_qr_detector_node" output="screen">
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+        <param name="camera_id" value="$(arg camera_id)" />
+    </node> -->
 
 </launch>
