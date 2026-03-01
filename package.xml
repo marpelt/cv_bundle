@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>cv_landolt_detector</name>
+  <version>0.0.0</version>
+  <description>Landolt c detection for Computer Vision Bundle</description>
+  <license>-</license>
+  <maintainer email="markus.peltsarszky@gmail.com">Markus Peltsarszky</maintainer>
+  <author email="markus.peltsarszky@gmail.com">Markus Peltsarszky</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>cv_msg</depend>
+
+  </package>
