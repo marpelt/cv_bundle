@@ -22,3 +22,6 @@
 [submodule "cv_msg"]
 	path = cv_msg
 	url = git@github.com:marpelt/cv_msg.git
+[submodule "cv_visualizer"]
+	path = cv_visualizer
+	url = git@github.com:marpelt/cv_visualizer.git
