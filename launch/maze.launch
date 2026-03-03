@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="model_h" default="hazmat.pt" />
+    <arg name="model_i" default="image.pt" />
+    <arg name="use_cuda" default="true" />
+    <arg name="min_confidence" default="75" />
+    <arg name="camera_topic" default="/screen/camera/image_raw/compressed" />
+    <arg name="camera_id" default="0" />
+    <arg name="cv_msg_topic" default="/cv_bundle" />
+    <arg name="tag_standard" default="tagStandard41h12" />
+
+    <node name="viz_node_cam_$(arg camera_id)" pkg="cv_visualizer" type="visualizer.py" output="screen">
+        <param name="camera_id" value="$(arg camera_id)" />
+        
+        <remap from="input_image" to="$(arg camera_topic)" />
+        <remap from="input_cv_data" to="$(arg cv_msg_topic)" />
+    </node>
+    <node name="april_detector_node" pkg="cv_april_detector" type="detector.py" output="screen">
+        <param name="tag_standard" value="$(arg tag_standard)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+    </node>
+    <node name="hazmat_detector_node" pkg="cv_hazmat_detector" type="detector.py" output="screen">
+        <param name="model_file" value="$(arg model_h)" />
+        <param name="device" value="$(eval 'cuda' if arg('use_cuda') else 'cpu')" />
+        <param name="min_confidence" value="$(arg min_confidence)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+    </node>
+    <node name="image_detector_node" pkg="cv_image_detector" type="detector.py" output="screen">
+        <param name="model_file" value="$(arg model_i)" />
+        <param name="device" value="$(eval 'cuda' if arg('use_cuda') else 'cpu')" />
+        <param name="min_confidence" value="$(arg min_confidence)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+    </node>
+</launch>

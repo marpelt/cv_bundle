@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="model_h" default="hazmat.pt" />
+    <arg name="use_cuda" default="false" />
+    <arg name="min_confidence" default="75" />
+    <arg name="camera_topic" default="/screen/camera/image_raw/compressed" />
+    <arg name="camera_id" default="0" />
+    <arg name="cv_msg_topic" default="/cv_bundle" />
+    <arg name="tag_standard" default="tagStandard41h12" />
+
+    <node name="viz_node_cam_$(arg camera_id)" pkg="cv_visualizer" type="visualizer.py" output="screen">
+        <param name="camera_id" value="$(arg camera_id)" />
+        <remap from="input_image" to="$(arg camera_topic)" />
+        <remap from="input_cv_data" to="$(arg cv_msg_topic)" />
+    </node>
+    <node name="hazmat_detector_node" pkg="cv_hazmat_detector" type="detector.py" output="screen">
+        <param name="model_file" value="$(arg model_h)" />
+        <param name="device" value="$(eval 'cuda' if arg('use_cuda') else 'cpu')" />
+        <param name="min_confidence" value="$(arg min_confidence)" />
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+    </node>
+    <node name="cv_qr_detector_node" pkg="cv_qr_detector" type="cv_qr_detector_node" output="screen">
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+        <param name="camera_id" value="$(arg camera_id)" />
+    </node>
+    <node name="cv_rotation_detector_node" pkg="cv_rotation_detector" type="cv_rotation_detector_node" output="screen">
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+        <param name="camera_id" value="$(arg camera_id)" />
+        <param name="blur" value="5" />
+        <param name="motion_threshold" value="1.1" />
+        <param name="scale_factor" value="0.5" />
+        <param name="min_area_ratio" value="0.005" />
+        <param name="motion_accumulator" value="0.98" />
+    </node>
+    <node name="landolt_detector_node" pkg="cv_landolt_detector" type="cv_landolt_detector_node"  output="screen">
+        <param name="camera_topic" value="$(arg camera_topic)" />
+        <param name="cv_msg_topic" value="$(arg cv_msg_topic)" />
+        <param name="camera_id" value="$(arg camera_id)" />
+    </node>
+    <!-- TODO: Thermal, Sound, Magnet -->
+</launch>
