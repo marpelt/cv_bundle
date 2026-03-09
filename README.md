@@ -12,3 +12,8 @@ The only external requirement is a tool to visualize image streams, such as:
 - rqt_image_view
 - RViz
 - Any compatible image topic viewer
+
+
+```bash
+git clone --recursive git@github.com:marpelt/cv_bundle.git
+```
