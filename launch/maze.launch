@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="model_h" default="hazmat.pt" />
+    <arg name="model_h" default="hazmat2026_b.pt" />
     <arg name="model_i" default="image.pt" />
     <arg name="use_cuda" default="true" />
     <arg name="min_confidence" default="75" />

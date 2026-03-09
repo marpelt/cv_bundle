@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="model" default="hazmat.pt" />
+    <arg name="model" default="hazmat2026_b.pt" />
     <arg name="use_cuda" default="false" />
     <arg name="min_confidence" default="75" />
     <arg name="camera_topic" default="/screen/camera/image_raw/compressed" />
