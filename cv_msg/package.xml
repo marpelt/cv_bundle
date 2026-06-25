@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>cv_msg</name>
+    <version>0.0.0</version>
+    <description>Custom message for Computer Vision Bundle</description>
+
+    <maintainer email="markus.peltsarszky@gmail.com">Markus Peltsarszky</maintainer>
+    <license>BSD 3-Clause License</license>
+    <author email="markus.peltsarszky@gmail.com">Markus Peltsarszky</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>roscpp</build_depend>
+    <build_depend>sensor_msgs</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_depend>message_generation</build_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>sensor_msgs</exec_depend>
+    <exec_depend>std_msgs</exec_depend>
+    <exec_depend>message_runtime</exec_depend>
+
+    <export>
+    </export>
+</package>
