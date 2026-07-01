@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 import pupil_apriltags
 
 from cv_bridge import CvBridge, CvBridgeError
@@ -13,19 +13,19 @@ class ImageProcessor:
     def __init__(self):
         self.bridge = CvBridge()
     
-        cam_input_topic = rospy.get_param('~camera_topic', '/screen/camera/image_raw/compressed')
+        cam_input_topic = rospy.get_param('~camera_topic', '/screen/camera/image_raw')
         tag_standard = rospy.get_param('~tag_standard', 'tagStandard41h12')
         self.camera_id = rospy.get_param('~camera_id', 0)
-        self.cv_msg_topic = rospy.get_param('~cv_msg_topic', '/cv_bundle')
+        self.cv_msg_topic = rospy.get_param('~cv_msg_topic', 'cv_bundle')
 
         self.detector = pupil_apriltags.Detector(families=tag_standard)
 
         self.cv_pub = rospy.Publisher(self.cv_msg_topic + "/april", CV_msg, queue_size=1)
-        self.image_sub = rospy.Subscriber(cam_input_topic, CompressedImage, self.image_callback)
+        self.image_sub = rospy.Subscriber(cam_input_topic, Image, self.image_callback)
 
     def image_callback(self, msg):
         try:
-            cv_image = self.bridge.compressed_imgmsg_to_cv2(msg, "mono8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "mono8")
             img_h, img_w = cv_image.shape[:2]
 
             bundle_msg = CV_msg()
@@ -39,7 +39,6 @@ class ImageProcessor:
             detections = []
 
             if tag_detections:
-                
                 for detection in tag_detections:
                     det = April_Detection()
                     det.content = str(detection.tag_id)

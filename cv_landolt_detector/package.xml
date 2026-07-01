@@ -5,7 +5,6 @@
   <description>Landolt c detection for Computer Vision Bundle</description>
   <license>-</license>
   <maintainer email="markus.peltsarszky@gmail.com">Markus Peltsarszky</maintainer>
-  <author email="markus.peltsarszky@gmail.com">Markus Peltsarszky</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

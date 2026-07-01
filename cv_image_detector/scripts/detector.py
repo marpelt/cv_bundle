@@ -3,7 +3,7 @@
 import rospy
 import rospkg
 import os
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from ultralytics import YOLO
 import torch
@@ -17,9 +17,9 @@ class ImageProcessor:
         model_file = rospy.get_param('~model_file', 'image.pt')
         self.min_confidence = rospy.get_param('~min_confidence', 75)
         device_type = rospy.get_param('~device', 'cpu')
-        cam_input_topic = rospy.get_param('~camera_topic', '/screen/camera/image_raw/compressed')
+        cam_input_topic = rospy.get_param('~camera_topic', '/screen/camera/image_raw')
         self.camera_id = rospy.get_param('~camera_id', 0)
-        self.cv_msg_topic = rospy.get_param('~cv_msg_topic', '/cv_bundle')
+        self.cv_msg_topic = rospy.get_param('~cv_msg_topic', 'cv_bundle')
 
         self.cv_pub = rospy.Publisher(self.cv_msg_topic + "/image", CV_msg, queue_size=1)
 
@@ -36,11 +36,11 @@ class ImageProcessor:
             rospy.logerr(f"Fehler des Modells: {e}")
             return
 
-        self.image_sub = rospy.Subscriber(cam_input_topic, CompressedImage, self.image_callback)
+        self.image_sub = rospy.Subscriber(cam_input_topic, Image, self.image_callback)
 
     def image_callback(self, msg):
         try:
-            cv_image = self.bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             img_h, img_w = cv_image.shape[:2]
             results = self.model(cv_image, verbose=False)
 

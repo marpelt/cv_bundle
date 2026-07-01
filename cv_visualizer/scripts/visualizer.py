@@ -2,13 +2,13 @@
 import rospy
 import cv2
 from cv_bridge import CvBridge
-from sensor_msgs.msg import CompressedImage, Image
+from sensor_msgs.msg import Image
 from cv_msg.msg import CV_msg
 
 class Visualizer:
     def __init__(self):
         self.camera_id = rospy.get_param('~camera_id', 0)
-        self.cv_base_topic = rospy.get_param('~input_cv_data', '/cv_bundle')
+        self.cv_base_topic = rospy.get_param('~input_cv_data', 'cv_bundle')
         
         self.bridge = CvBridge()
         
@@ -26,7 +26,7 @@ class Visualizer:
         }
 
         self.pub = rospy.Publisher(f'{self.cv_base_topic}/viz/{self.camera_id}', Image, queue_size=10)
-        self.image_sub = rospy.Subscriber("input_image", CompressedImage, self.image_callback)
+        self.image_sub = rospy.Subscriber("input_image", Image, self.image_callback)
 
         topics = ['qr', 'april', 'hazmat', 'image', 'landolt', 'rotation']
         for t in topics:
@@ -66,7 +66,7 @@ class Visualizer:
 
     def image_callback(self, img_msg):
         try:
-            cv_image = self.bridge.compressed_imgmsg_to_cv2(img_msg, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(img_msg, "bgr8")
             h, w = cv_image.shape[:2]
 
             for det_type, (detections, last_time) in self.data_store.items():

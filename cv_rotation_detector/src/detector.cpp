@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <sensor_msgs/Image.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
@@ -8,14 +9,14 @@
 class RotationDetector {
 public:
     RotationDetector(ros::NodeHandle& nh, ros::NodeHandle& nh_private) {
-        nh_private.param<std::string>("camera_topic", input_topic_, "/screen/camera/image_raw/compressed");
-        nh_private.param<std::string>("cv_msg_topic", cv_msg_topic_, "/cv_bundle");
+        nh_private.param<std::string>("camera_topic", input_topic_, "/screen/camera/image_raw");
+        nh_private.param<std::string>("cv_msg_topic", cv_msg_topic_, "cv_bundle");
         nh_private.param<std::string>("output_topic", output_topic_, "/motion/image/compressed");
         nh_private.param<int>("camera_id", camera_id_, 0);
         nh_private.param<int>("blur", blur_kernel_, 5);
-        nh_private.param<double>("motion_threshold", motion_threshold_, 1.1); //bewegungsgeschwindigkeit als schwelle, rauschen
-        nh_private.param<double>("scale_factor", scale_factor_, 0.5); //bildscale, cpulast
-        nh_private.param<double>("min_area_ratio", min_area_ratio_, 0.005); // min größe kreis zum detektieren (prozent)
+        nh_private.param<double>("motion_threshold", motion_threshold_, 1.1); 
+        nh_private.param<double>("scale_factor", scale_factor_, 0.5); 
+        nh_private.param<double>("min_area_ratio", min_area_ratio_, 0.005); 
         nh_private.param<double>("motion_accumulator", motion_accumulator_diff, 0.98);
 
         image_sub_ = nh.subscribe(input_topic_, 1, &RotationDetector::imageCallback, this);
@@ -38,8 +39,17 @@ private:
     const int max_heatmap_value_ = 50;
     double min_area_ratio_;
 
-    void imageCallback(const sensor_msgs::CompressedImage::ConstPtr& msg) {
-        cv::Mat raw_frame = cv::imdecode(cv::Mat(msg->data), cv::IMREAD_COLOR);
+    void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+        cv_bridge::CvImagePtr cv_ptr;
+        try {
+            cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        }
+        catch (cv_bridge::Exception& e) {
+            ROS_ERROR("cv_bridge Ausnahme: %s", e.what());
+            return;
+        }
+
+        cv::Mat raw_frame = cv_ptr->image;
         if (raw_frame.empty()) return;
 
         cv::Mat frame;
@@ -52,7 +62,7 @@ private:
         cv_msg::CV_msg cv_msg;
         cv_msg.header.stamp = msg->header.stamp;
         cv_msg.header.frame_id = "placeholder";
-        cv_msg.camera_id = 0;
+        cv_msg.camera_id = camera_id_;
 
         if (prev_gray_.empty()) {
             prev_gray_ = gray_blurred.clone();
@@ -134,7 +144,6 @@ private:
                     double img_w = static_cast<double>(frame.cols);
                     double img_h = static_cast<double>(frame.rows);
 
-                    cv::Rect roi = cv::boundingRect(cnt);
                     rot_det.bbox.cx = (roi.x + roi.width / 2.0) / img_w;
                     rot_det.bbox.cy = (roi.y + roi.height / 2.0) / img_h;
                     rot_det.bbox.width = static_cast<double>(roi.width) / img_w;
@@ -143,7 +152,6 @@ private:
 
                     cv_msg.rotation_detections.push_back(rot_det);
                     cv_msg_pub_.publish(cv_msg);
-
                 }
             }
         }

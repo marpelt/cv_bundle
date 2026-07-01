@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <sensor_msgs/CompressedImage.h>
+#include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -37,7 +37,7 @@ private:
     ros::NodeHandle nh_;
     ros::NodeHandle private_nh_;
     
-    ros::Subscriber sub_camera_compressed_;
+    ros::Subscriber sub_camera_;
     ros::Publisher cv_msg_pub_;
 
     std::string camera_topic_;
@@ -119,19 +119,19 @@ public:
     LandoltDetector(ros::NodeHandle& nh, ros::NodeHandle& pnh) 
         : nh_(nh), private_nh_(pnh)
     {
-        private_nh_.param<std::string>("camera_topic", camera_topic_, "/screen/camera/image_raw/compressed");
-        private_nh_.param<std::string>("cv_msg_topic", cv_msg_topic_, "/cv_bundle");
+        private_nh_.param<std::string>("camera_topic", camera_topic_, "/screen/camera/image_raw");
+        private_nh_.param<std::string>("cv_msg_topic", cv_msg_topic_, "cv_bundle");
         private_nh_.param<int>("camera_id", camera_id_, 0);
 
         min_edge_ = 12;
         min_ratio_circle_ = 0.8f;
         min_depth_ = 10;
 
-        sub_camera_compressed_ = nh_.subscribe(camera_topic_, 1, &LandoltDetector::image_callback, this);
+        sub_camera_ = nh_.subscribe(camera_topic_, 1, &LandoltDetector::image_callback, this);
         cv_msg_pub_ = nh_.advertise<cv_msg::CV_msg>(cv_msg_topic_ + "/landolt", 1);
     }
 
-    void image_callback(const sensor_msgs::CompressedImageConstPtr &image_msg)
+    void image_callback(const sensor_msgs::ImageConstPtr &image_msg)
     {
         cv_bridge::CvImagePtr cv_ptr;
         try {

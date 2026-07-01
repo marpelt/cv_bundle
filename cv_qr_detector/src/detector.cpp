@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <sensor_msgs/CompressedImage.h>
+#include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 #include <zbar.h>
@@ -10,33 +10,33 @@ class QR {
 public:
     QR() : nh_(), pnh_("~") {
         std::string sub_topic, pub_topic;
-        pnh_.param<std::string>("camera_topic", sub_topic, "/screen/camera/image_raw/compressed");
-        pnh_.param<std::string>("cv_msg_topic", pub_topic, "/cv_bundle");
+        pnh_.param<std::string>("camera_topic", sub_topic, "/screen/camera/image_raw");
+        pnh_.param<std::string>("cv_msg_topic", pub_topic, "cv_bundle");
         pnh_.param<int>("camera_id", camera_id_, 0);
         
-        image_sub_ = nh_.subscribe(sub_topic, 1, &QR::compressedImageCallback, this);
+        image_sub_ = nh_.subscribe(sub_topic, 1, &QR::imageCallback, this);
         cv_pub_ = nh_.advertise<cv_msg::CV_msg>(pub_topic + "/qr", 10);
         
         scanner_.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 0);
         scanner_.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
     }
 
-    void compressedImageCallback(const sensor_msgs::CompressedImageConstPtr& msg) {
-        cv::Mat raw_img;
+    void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+        cv_bridge::CvImagePtr cv_ptr;
         try {
-            raw_img = cv::imdecode(cv::Mat(msg->data), cv::IMREAD_COLOR);
+            cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
         } catch (cv_bridge::Exception& e) {
-            ROS_ERROR("Fehler Dekodieren: %s", e.what());
+            ROS_ERROR("cv_bridge Ausnahme: %s", e.what());
             return;
         }
 
-        if (raw_img.empty()) return;
+        if (cv_ptr->image.empty()) return;
 
-        cv::Mat gray;
-        cv::cvtColor(raw_img, gray, cv::COLOR_BGR2GRAY);
+        double img_w = static_cast<double>(cv_ptr->image.cols);
+        double img_h = static_cast<double>(cv_ptr->image.rows);
 
         cv::Mat processed;
-        cv::GaussianBlur(gray, processed, cv::Size(3, 3), 0);
+        cv::GaussianBlur(cv_ptr->image, processed, cv::Size(3, 3), 0);
         cv::adaptiveThreshold(processed, processed, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
 
         zbar::Image zbar_img(processed.cols, processed.rows, "Y800", processed.data, processed.cols * processed.rows);
@@ -47,9 +47,6 @@ public:
         output_msg.camera_id = camera_id_;
 
         if (scanner_.scan(zbar_img) > 0) {
-            double img_w = static_cast<double>(raw_img.cols);
-            double img_h = static_cast<double>(raw_img.rows);
-
             for (zbar::Image::SymbolIterator symbol = zbar_img.symbol_begin(); symbol != zbar_img.symbol_end(); ++symbol) {
                 cv_msg::QR_Detection qr_det;
                 qr_det.data = symbol->get_data();
